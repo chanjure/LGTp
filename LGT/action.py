@@ -67,10 +67,13 @@ class action:
 			Symmetry group element
 		"""
 
-		g = None
+		g = np.ones(self.lat_shape)
 
 		if self.field_type == 'Ising':
-			g = np.random.choice([-1,1],self.lat_shape)
+
+			a = np.random.randint(self.lat_shape[0])
+			b = np.random.randint(self.lat_shape[1])
+			g[a,b] = -1
 		
 		elif self.field_type == 'U(1)':
 			g = None
@@ -98,6 +101,7 @@ class action:
 		float (or complex)
 		"""
 
+		#TODO: Make boundary condition option
 		S = 0.
 		N = self.lat_shape[0]
 		M = self.lat_shape[1]
@@ -105,11 +109,13 @@ class action:
 		if self.field_type == 'Ising':
 			for i in range(N):
 				for j in range(M):
-					nn = 0.
-					for di in [-1,0,1]:
-						for dj in [-1,0,1]:
-							nn += field[(i+di+N)%N][(j+dj+M)%M]
-					S += -2.*(self.bare_args["J"]*nn + self.bare_args["mu"]*self.bare_args["h"])*field[(i+N)%N][(j+M)%M]
+					
+					nn = field[(i-1+N)%N][(j+M)%M] \
+					+ field[(i+1+N)%N][(j+M)%M] \
+					+ field[(i+N)%N][(j-1+M)%M] \
+					+ field[(i+N)%N][(j+1+M)%M] \
+
+					S += -1.*(self.bare_args["J"]*nn + self.bare_args["mu"]*self.bare_args["h"])*field[(i+N)%N][(j+M)%M]
 
 		elif self.field_type == 'U(1)':
 			S = 0

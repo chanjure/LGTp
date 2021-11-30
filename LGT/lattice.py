@@ -54,7 +54,7 @@ class Lattice:
 		#	raise ValueError('\n ERR_ID 0 : Unavailable lattice type. Available list : ', available_lat_type_list)
 
 		# Set lattice object
-		#self.dim = len(lat_shape)
+		self.dim = len(lat_shape)
 		#self.latt = [None]*lat_shape[0]
 		#for s in lat_shape[1:]:
 		#	self.latt = [self.latt]*s
@@ -97,7 +97,7 @@ class Lattice:
 			if self.init_scheme == 'Cold':
 				self.field = np.ones(self.lat_shape)
 			elif self.init_scheme == 'Hot':
-				self.field = (np.random.randint(0, 2, self.lat_shape) - 0.5)*2
+				self.field = 2*np.random.randint(0, 2, self.lat_shape) - 1
 			#else:
 			#	self.err(err_id=1, err_msg='Ising')
 		

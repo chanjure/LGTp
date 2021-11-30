@@ -27,7 +27,10 @@ from . import action
 #
 #	def __init__(self, ):
 
-def metropolis(latt, action_type, discard, bare_args):
+#def autocorrelation():
+
+
+def metropolis(latt, action_type, sweep=None, bare_args=None):
 	"""Metropolis algorithm
 
 	Note
@@ -52,17 +55,22 @@ def metropolis(latt, action_type, discard, bare_args):
 		
 	"""
 
+	# MC parameter settings
 	G = action(latt, bare_args)
-
 	beta = bare_args["beta"]
+	#TODO add sweep scheme as an option
+	if sweep == None:
+		sweep = 1
+		for i in range(latt.dim):
+			sweep *= latt.lat_shape[i]
 
 	old_field = latt.field
-	new_field = old_field
+	new_field = None
 
 	S_diff = 0.
 	accept = 0
 
-	for i in range(discard):
+	for i in range(sweep):
 		g = G.transform()
 		new_field = old_field*g
 		S_diff += G.DS(old_field, new_field)
