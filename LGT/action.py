@@ -122,7 +122,7 @@ class action:
 
 		return S
 
-	def DS(self, old_field, new_field):
+	def DS(self, new_field, old_field):
 		"""Difference in action
 
 		Note
@@ -144,7 +144,7 @@ class action:
 		dS = 0.
 
 		if self.field_type == 'Ising':
-			dS = self.S(old_field) - self.S(new_field)
+			dS = self.S(new_field) - self.S(old_field)
 		elif self.field_type == 'U(1)':
 			dS = 0.
 		#else:
