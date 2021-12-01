@@ -60,11 +60,9 @@ def metropolis(latt, bare_args={'beta':1}):
 	beta = bare_args["beta"]
 	
 	#TODO add sweep scheme as an option
-	sweep = None
-	if sweep == None:
-		sweep = 1
-		for i in range(latt.dim):
-			sweep *= latt.lat_shape[i]
+	sweep = 1
+	for i in range(latt.dim):
+		sweep *= latt.lat_shape[i]
 
 	old_field = latt.field
 	new_field = None
@@ -74,9 +72,9 @@ def metropolis(latt, bare_args={'beta':1}):
 	for i in range(sweep):
 		g = G.transform()
 		new_field = old_field*g
-		S_diff = G.DS(new_field, old_field)
+		dS = G.DS(new_field, old_field)
 
-		if np.random.rand() < np.exp(-beta*S_diff):
+		if np.random.rand() < np.exp(-beta*dS):
 			accept = 1
 			old_field = new_field
 

@@ -58,6 +58,7 @@ class Lattice:
 		#self.latt = [None]*lat_shape[0]
 		#for s in lat_shape[1:]:
 		#	self.latt = [self.latt]*s
+		#TODO add rng selection
 
 	def init_fields(self, field_type, init_scheme):
 		"""Set fields on the lattice

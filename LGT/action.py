@@ -109,18 +109,18 @@ class action:
 		if self.field_type == 'Ising':
 			for i in range(N):
 				for j in range(M):
-					
+					s = field[i,j]					
 					nn = field[(i-1+N)%N][(j+M)%M] \
 					+ field[(i+1+N)%N][(j+M)%M] \
 					+ field[(i+N)%N][(j-1+M)%M] \
-					+ field[(i+N)%N][(j+1+M)%M] \
+					+ field[(i+N)%N][(j+1+M)%M]
 
-					S += -1.*(self.bare_args["J"]*nn + self.bare_args["mu"]*self.bare_args["h"])*field[(i+N)%N][(j+M)%M]
+					S += -1.*(self.bare_args["J"]*nn + self.bare_args["mu"]*self.bare_args["h"])*s
 
 		elif self.field_type == 'U(1)':
 			S = 0
 
-		return S
+		return S*0.5 # divide by overcounting n <-> m
 
 	def DS(self, new_field, old_field):
 		"""Difference in action
