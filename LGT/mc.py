@@ -6,6 +6,7 @@
 
 import numpy as np
 from . import action
+
 #import err
 
 # TODO Make it module class later
@@ -30,7 +31,7 @@ from . import action
 #def autocorrelation():
 
 
-def metropolis(latt, bare_args={'beta':1}):
+def metropolis(lat, bare_args={'beta':1}):
 	"""Metropolis algorithm
 
 	Note
@@ -56,30 +57,24 @@ def metropolis(latt, bare_args={'beta':1}):
 	"""
 
 	# MC parameter settings
-	G = action(latt, bare_args)
+	G = action(lat, bare_args)
 	beta = bare_args["beta"]
 	
 	#TODO add sweep scheme as an option
 	sweep = 1
-	for i in range(latt.dim):
-		sweep *= latt.lat_shape[i]
-
-	old_field = latt.field
-	new_field = None
+	for i in range(lat.dim):
+		sweep *= lat.lat_shape[i]
 
 	accept = 0
 
 	for i in range(sweep):
-		g = G.transform()
-		new_field = old_field*g
-		dS = G.DS(new_field, old_field)
+		dS, new_field = G.DS(lat.field)
 
 		if np.random.rand() < np.exp(-beta*dS):
 			accept = 1
-			old_field = new_field
+			lat.field = new_field
 
-	latt.field = old_field
-	return (old_field, accept)
+	return (lat.field, accept)
 		
 	
 

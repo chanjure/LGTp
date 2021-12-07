@@ -83,7 +83,7 @@ class Lattice:
 		self.init_scheme = init_scheme
 		
 		# Initialization parameter validation list
-		available_field_type_list = ['Ising', 'U(1)', 'SU(3)']
+		available_field_type_list = ['Ising2d', 'U(1)', 'SU(3)']
 		available_init_scheme_list = ['Cold', 'Hot', 'man']
 
 		# Initialization step error control
@@ -94,7 +94,7 @@ class Lattice:
 			raise ValueError('\n ERR_ID 1 : Unavailable field initialization scheme. Available list : ', available_init_scheme_list)
 
 		# Set field value at each lattice points.
-		if self.field_type == 'Ising':
+		if self.field_type == 'Ising2d':
 			if self.init_scheme == 'Cold':
 				self.field = np.ones(self.lat_shape)
 			elif self.init_scheme == 'Hot':
@@ -104,12 +104,34 @@ class Lattice:
 		
 		elif self.field_type == 'U(1)':
 			if self.init_scheme == 'Cold':
-				self.field = np.ones(self.lat_shape + [dim])
+				self.field = np.ones(self.lat_shape + [self.dim])
 			elif self.init_scheme == 'Hot':
-				self.field = np.random.uniform(0., 1., self.lat_shape)
+				phi = np.random.uniform(-np.pi, np.pi, self.lat_shape + [self.dim])
+				self.field = np.exp(1j*phi)
 				#TODO change random range as a input parameter
 			#else:
 			# self.err(err_id=1, err_msg='U(1)')
+
+	def bare_parameter_generator(self,):
+		if self.field_type == "Ising2d":
+			bare_args = {'beta':0.1,'J':1.,'h':0.,'mu':0}
+		elif self.field_type == "U1":
+			bare_args = {'beta':0.1}
+
+		return bare_args
+
+	def bare_parameter_checker(self, bare_args):
+		Ising2d_paramters = {'beta':0.1,'J':1.,'h':0.,'mu':0}
+		U1_parameters = {'beta':0.1}
+
+		if self.field_type == 'Ising2d':
+			check = (bare_args.keys() == Ising2d_paramters.keys())
+		elif self.field_type == 'U1':
+			check = (bare_args.keys() == U1_paramters.keys())
+
+		return check
+
+
 
 	#def generate():
 	# generate configuration

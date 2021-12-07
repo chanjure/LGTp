@@ -7,48 +7,18 @@
 import numpy as np
 #import err
 
-class action:
-	"""action class
-
-	This is a action class.
-	It contains functions using actions.
-	Group transform and calculating actions are included here.
-
-	Example
-	-------
-
-	Notes
-	-----
-
-	Attributes
-	----------
-
-	"""
-	#TODO add needed bareparameter list printing
-
-	def __init__(self, latt, bare_args):
-		"""Initialize action related parameters
-
-		Note
-		----
+class Ising2d():
+	
+	def __init__(self, lat, bare_args):
 		
-		ERR_ID = act_0
-
-		Parameters
-		----------
-		lat_shape : list
-			Shape of the lattice
-		field_type : str
-			Field type selects action
-		bare_arg : dic
-			dictionary of bare parameters.
-
-		"""
-
-		self.lat_shape = latt.lat_shape
-		self.field_type = latt.field_type
-		self.bare_args = bare_args
-
+		if not lat.bare_parameter_checker(bare_args):
+			raise ValueError("Wrong bare parameter. Use bare_parameter_generator to use bare parameter template.")
+		
+		self.lat_shape = lat.lat_shape
+		self.J = bare_args['J']
+		self.h = bare_args['h']
+		self.mu = bare_args['mu']
+	
 	def transform(self,):
 		"""Generates symmetry group element.
 
@@ -66,63 +36,35 @@ class action:
 		np.array 
 			Symmetry group element
 		"""
+		#TODO : make it depend on self.dim
 
 		g = np.ones(self.lat_shape)
 
-		if self.field_type == 'Ising':
-
-			a = np.random.randint(self.lat_shape[0])
-			b = np.random.randint(self.lat_shape[1])
-			g[a,b] = -1
+		a = np.random.randint(self.lat_shape[0])
+		b = np.random.randint(self.lat_shape[1])
+		g[a,b] = -1
 		
-		elif self.field_type == 'U(1)':
-			g = None
-		#else:
-		#	err.err(err_id=1, err_msg='blah')
-
 		return g
-
+	
 	def S(self, field):
-		"""Calculate action
 		
-		Note
-		----
-		Calculate action
-
-		ERR_ID = act_2
-
-		Parameters
-		----------
-		field : dic
-			bare parameters
-
-		Returns
-		-------
-		float (or complex)
-		"""
-
-		#TODO: Make boundary condition option
 		S = 0.
 		N = self.lat_shape[0]
 		M = self.lat_shape[1]
 
-		if self.field_type == 'Ising':
-			for i in range(N):
-				for j in range(M):
-					s = field[i,j]					
-					nn = field[(i-1+N)%N][(j+M)%M] \
-					+ field[(i+1+N)%N][(j+M)%M] \
-					+ field[(i+N)%N][(j-1+M)%M] \
-					+ field[(i+N)%N][(j+1+M)%M]
+		for i in range(N):
+			for j in range(M):
+				s = field[i,j]
+				nn = field[(i-1+N)%N][(j+M)%M] \
+				+ field[(i+1+N)%N][(j+M)%M] \
+				+ field[(i+N)%N][(j-1+M)%M] \
+				+ field[(i+N)%N][(j+1+M)%M]
 
-					S += -1.*(self.bare_args["J"]*nn + self.bare_args["mu"]*self.bare_args["h"])*s
+				S += -1.*(self.J*nn + self.mu*self.h)*s
 
-		elif self.field_type == 'U(1)':
-			S = 0
+		return S*0.5
 
-		return S*0.5 # divide by overcounting n <-> m
-
-	def DS(self, new_field, old_field):
+	def DS(self, field):
 		"""Difference in action
 
 		Note
@@ -141,14 +83,58 @@ class action:
 		float
 		"""
 
-		dS = 0.
+		new_field = field.copy()
+		N = len(new_field)
 
-		if self.field_type == 'Ising':
-			dS = self.S(new_field) - self.S(old_field)
-		elif self.field_type == 'U(1)':
-			dS = 0.
-		#else:
-		# err
+		a = np.random.randint(0,N)
+		b = np.random.randint(0,N)
+		s = field[a,b]
+		nn = field[(a+1)%N,b] \
+				+field[(a-1)%N,b] \
+				+field[a,(b+1)%N] \
+				+field[a,(b-1)%N]
+		
+		dS = 2.*(self.J*nn + self.h*self.mu)*s
 
-		return dS
+		new_field[a,b] *= -1
 
+		return dS, new_field
+
+class U1():
+
+	def __init__(self, lat, bare_args):
+		
+		if not lat.bare_parameter_checker(bare_args):
+			raise ValueError("Wrong bare parameter. Use bare_parameter_generator to use bare parameter template.")
+		
+		pass
+
+	def plaq():
+		pass
+
+def action(lat, bare_args):
+	"""action class
+
+	This is a action class.
+	It contains functions using Ising model actions.
+	Group transform and calculating actions are included here.
+
+	Example
+	-------
+
+	Notes
+	-----
+
+	Attributes
+	----------
+
+	"""
+	#TODO add needed bareparameter list printing
+	if lat.field_type == "Ising2d":
+		act = Ising2d(lat, bare_args)
+	elif lat.field_type == "U1":
+		act = U1(lat, bare_args)
+	else:
+		raise ValueError("Wrong action type.")
+
+	return act
