@@ -54,7 +54,13 @@ class Lattice:
 		#	raise ValueError('\n ERR_ID 0 : Unavailable lattice type. Available list : ', available_lat_type_list)
 
 		# Set lattice object
-		self.dim = len(lat_shape)
+		self.lat_dim = len(lat_shape)
+		self.lat_size = 1.
+		
+		for i in range(self.lat_dim):
+			self.lat_size *= self.lat_shape[i]
+
+		self.aux_index = 1 # auxilary index including dirac, color etc.
 		#self.latt = [None]*lat_shape[0]
 		#for s in lat_shape[1:]:
 		#	self.latt = [self.latt]*s
@@ -103,10 +109,11 @@ class Lattice:
 			#	self.err(err_id=1, err_msg='Ising')
 		
 		elif self.field_type == 'U(1)':
+			self.aux_index = self.lat_dim
 			if self.init_scheme == 'Cold':
-				self.field = np.ones(self.lat_shape + [self.dim])
+				self.field = np.ones(self.lat_shape + [self.lat_dim])
 			elif self.init_scheme == 'Hot':
-				phi = np.random.uniform(-np.pi, np.pi, self.lat_shape + [self.dim])
+				phi = np.random.uniform(-np.pi, np.pi, self.lat_shape + [self.lat_dim])
 				self.field = np.exp(1j*phi)
 				#TODO change random range as a input parameter
 			#else:
