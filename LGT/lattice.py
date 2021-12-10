@@ -90,7 +90,7 @@ class Lattice:
 		self.init_scheme = init_scheme
 		
 		# Initialization parameter validation list
-		available_field_type_list = ['Ising2d', 'U(1)', 'SU(3)']
+		available_field_type_list = ['Ising2d', 'U1', 'SU3']
 		available_init_scheme_list = ['Cold', 'Hot', 'man']
 
 		# Initialization step error control
@@ -109,10 +109,10 @@ class Lattice:
 			#else:
 			#	self.err(err_id=1, err_msg='Ising')
 		
-		elif self.field_type == 'U(1)':
+		elif self.field_type == 'U1':
 			self.aux_index = self.lat_dim
 			if self.init_scheme == 'Cold':
-				self.field = np.ones(self.lat_shape + [self.lat_dim])
+				self.field = np.ones(self.lat_shape + [self.lat_dim], dtype=np.complex128)
 			elif self.init_scheme == 'Hot':
 				phi = np.random.uniform(-np.pi, np.pi, self.lat_shape + [self.lat_dim])
 				self.field = np.exp(1j*phi)
@@ -135,7 +135,7 @@ class Lattice:
 		if self.field_type == 'Ising2d':
 			check = (bare_args.keys() == Ising2d_paramters.keys())
 		elif self.field_type == 'U1':
-			check = (bare_args.keys() == U1_paramters.keys())
+			check = (bare_args.keys() == U1_parameters.keys())
 
 		return check
 

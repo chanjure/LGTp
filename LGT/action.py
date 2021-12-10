@@ -111,7 +111,7 @@ class U1():
 		self.lat_dim = lat.lat_dim
 		self.lat_size = lat.lat_size
 
-	def transform():
+	def transform(self,):
 		"""Generates symmetry group element.
 
 		Note
@@ -130,15 +130,15 @@ class U1():
 		"""
 		#TODO : make it depend on self.dim
 
-		g = np.ones(self.lat_shape)
+#		g = np.ones(self.lat_shape)
 
-		a = np.random.randint(self.lat_shape[0])
-		b = np.random.randint(self.lat_shape[1])
-		c = np.random.randint(self.lat_shape[2])
-		d = np.random.randint(self.lat_shape[3])
+#	a = np.random.randint(self.lat_shape[0])
+#	b = np.random.randint(self.lat_shape[1])
+#	c = np.random.randint(self.lat_shape[2])
+#	d = np.random.randint(self.lat_shape[3])
 
 		phi = np.random.uniform(-np.pi,np.pi)
-		g[a,b,c,d] = np.exp(1j*phi)
+		g = np.exp(1j*phi)
 		
 		return g
 	
@@ -150,7 +150,7 @@ class U1():
 		for n in np.ndindex(N):
 			for mu in range(self.lat_dim):
 				for nu in range(mu):
-					s += (1. - plaquette(field,n,mu,nu)).real
+					s += (1. - self.plaquette(field,n,mu,nu)).real
 
 		return s
 
@@ -181,8 +181,11 @@ class U1():
 		z = np.random.randint(0,N[2])
 		t = np.random.randint(0,N[3])
 		
-		A = staple(field,n,mu)
-		g = transform()
+		n = tuple([x,y,z,t])
+
+		A = self.staple(field,n,mu)
+		phi = np.random.uniform(-np.pi,np.pi)
+		g = np.exp(1j*phi)
 		
 		dS  = np.sum((field[x,y,z,t,mu]*(g - 1.)*A).real)
 
@@ -190,9 +193,10 @@ class U1():
 
 		return dS, new_field
 		
-	def plaquette(field,n,mu,nu):
+	def plaquette(self,field,n,mu,nu):
 
-		e = np.identity(self.lat_dim,dtype=int)
+		e = np.identity(self.lat_dim, dtype=int)
+		
 		N = self.lat_shape
 		n = np.array(n)
 		p = (field[tuple(n)+(mu,)]
@@ -203,13 +207,15 @@ class U1():
 		
 		return p
 
-	def staple(field,n,mu):
+	def staple(self,field,n,mu):
 		
-		e = np.identity(self.lat_dim,dtype=int)
+		e = np.identity(self.lat_dim, dtype=int)
+		
 		N = self.lat_shape
 		A = 0.
-		n = np.array([x,y,z,t])
-
+		
+		n = np.array(n)
+		
 		for nu in range(self.lat_dim):
 			if nu != mu:
 				A += (field[tuple((n+e[mu])%N)+(nu,)]
