@@ -195,13 +195,13 @@ class U1():
 		
 	def plaquette(self,field,n,mu,nu):
 
-		e = np.identity(self.lat_dim, dtype=int)
+		_e = np.identity(self.lat_dim, dtype=int)
 		
 		N = self.lat_shape
 		n = np.array(n)
 		p = (field[tuple(n)+(mu,)]
-				*field[tuple((n+e[mu])%N)+(nu,)]
-				*(field[tuple((n+e[nu])%N)+(mu,)].conj())
+				*field[tuple((n+_e[mu])%N)+(nu,)]
+				*(field[tuple((n+_e[nu])%N)+(mu,)].conj())
 				*(field[tuple(n)+(nu,)].conj())
 				)
 		
@@ -209,7 +209,7 @@ class U1():
 
 	def staple(self,field,n,mu):
 		
-		e = np.identity(self.lat_dim, dtype=int)
+		_e = np.identity(self.lat_dim, dtype=int)
 		
 		N = self.lat_shape
 		A = 0.
@@ -218,12 +218,12 @@ class U1():
 		
 		for nu in range(self.lat_dim):
 			if nu != mu:
-				A += (field[tuple((n+e[mu])%N)+(nu,)]
-						 *(field[tuple((n+e[nu])%N)+(mu,)].conj())
+				A += (field[tuple((n+_e[mu])%N)+(nu,)]
+						 *(field[tuple((n+_e[nu])%N)+(mu,)].conj())
 						 *(field[tuple(n%N)+(nu,)].conj())
-						 +(field[tuple((n+e[mu]-e[nu])%N)+(nu,)].conj())
-						 *(field[tuple((n-e[nu])%N)+(mu,)].conj())
-						 *field[tuple((n-e[nu])%N)+(nu,)]
+						 +(field[tuple((n+_e[mu]-_e[nu])%N)+(nu,)].conj())
+						 *(field[tuple((n-_e[nu])%N)+(mu,)].conj())
+						 *field[tuple((n-_e[nu])%N)+(nu,)]
 						 )
 
 		return A
