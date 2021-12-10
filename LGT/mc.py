@@ -64,11 +64,12 @@ def metropolis(lat, bare_args={'beta':1}):
 	accept = 0
 	
 	for mu in range(lat.aux_index):
-		for i in lat.lat_size:
-			dS, new_field = G.DS(lat,field,mu)
+		for i in range(lat.lat_size):
+			dS, new_field = G.DS(lat.field,mu)
 
 			if np.random.rand() < np.exp(-beta*dS):
 				accept = 1
+				lat.field = new_field
 
 	return (lat.field, accept)
 		

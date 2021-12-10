@@ -55,7 +55,7 @@ class Lattice:
 
 		# Set lattice object
 		self.lat_dim = len(lat_shape)
-		self.lat_size = 1.
+		self.lat_size = 1
 		
 		for i in range(self.lat_dim):
 			self.lat_size *= self.lat_shape[i]
@@ -66,7 +66,7 @@ class Lattice:
 		#	self.latt = [self.latt]*s
 		#TODO add rng selection
 
-	def init_fields(self, field_type, init_scheme):
+	def init_fields(self, field_type, init_scheme, seed=0):
 		"""Set fields on the lattice
 
 		Note
@@ -84,7 +84,8 @@ class Lattice:
 		-------
 
 		"""
-
+		self.seed = seed
+		np.random.seed(self.seed)
 		self.field_type = field_type
 		self.init_scheme = init_scheme
 		
