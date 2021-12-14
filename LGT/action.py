@@ -147,7 +147,7 @@ class U1():
 		N = self.lat_shape
 		s = 0.
 
-		for n in np.ndindex(N):
+		for n in np.ndindex(tuple(N)):
 			for mu in range(self.lat_dim):
 				for nu in range(mu):
 					s += (1. - self.plaquette(field,n,mu,nu)).real
@@ -227,6 +227,33 @@ class U1():
 						 )
 
 		return A
+
+	def plaquetteSum(self,field):
+		"""Normalized plaquette sum
+		"""
+
+		N = self.lat_shape
+		sp = 0.
+
+		for n in np.ndindex(tuple(N)):
+			for nu in range(self.lat_dim):
+				for mu in range(nu):
+					sp += self.plaquette(field,n,mu,nu).real
+
+		return sp/self.lat_size/(self.lat_dim-1.)/2.
+
+	def polyakovLoop(self,field):
+
+		N = self.lat_shape
+		p = 0. + 0.j
+
+		for n in np.ndindex(tuple(N[:-1])):
+			p_local = 1. + 0.j
+			for t in range(N[-1]):
+				p_local *= field[tuple(n)+(t,)+(self.lat_dim-1,)]
+			p+= p_local
+
+		return p/self.lat_size*N[-1]
 
 def action(lat, bare_args):
 	"""action class
