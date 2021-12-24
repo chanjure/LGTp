@@ -296,19 +296,19 @@ class U1():
 		return p/self.lat_size*N[-1]
 	
 	def polyakovLoop_nb(self,field):
-		return self._polyakovLoop_nb(field,self.lat_shape,self.lat_size,self.lat_dim)
+		return self._polyakovLoop_nb(field,self.lat_size,self.lat_dim)
 	
 	@staticmethod
 	@nb.njit
-	def _polyakovLoop_nb(field,lat_shape,lat_size,lat_dim):
+	def _polyakovLoop_nb(field,lat_size,lat_dim):
 
-		N = lat_shape
+		N = np.shape(field)[:-1]
 		p = 0. + 0.j
 
-		for n in np.ndindex(tuple(N[:-1])):
+		for n in np.ndindex(N[:-1]):
 			p_local = 1. + 0.j
 			for t in range(N[-1]):
-				p_local *= field[tuple(n)+(t,)+(lat_dim-1,)]
+				p_local *= field[n+(t,)+(lat_dim-1,)]
 			p += p_local
 
 		return p/lat_size*N[-1]
