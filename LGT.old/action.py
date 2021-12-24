@@ -5,7 +5,6 @@
 # --------------- #
 
 import numpy as np
-import numba as nb
 import time
 #import err
 
@@ -245,42 +244,8 @@ class U1():
 
 		return sp/self.lat_size/(self.lat_dim-1.)/2.
 
-	def plaquetteSum_nb(self,field):
-		return self._plaquetteSum_nb(field,self.lat_dim,self.lat_size)
-	
-	@staticmethod
-	@nb.jit
-	def _plaquetteSum_nb(field,lat_dim,lat_size):
+	#def plaquetteSum_cp(self,field):
 
-		#e = np.identity(lat_dim,dtype=int)
-		e = np.array([[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]])
-		
-		N = np.shape(field)[:-1]
-		sp = 0.
-
-		for n in np.ndindex(N):
-			for nu in range(lat_dim):
-				for mu in range(nu):
-					dir_mu = ((n[0]+e[mu][0])%N[0]
-							,(n[1]+e[mu][1])%N[1]
-							,(n[2]+e[mu][2])%N[2]
-							,(n[3]+e[mu][3])%N[3]
-							)
-					dir_nu = ((n[0]+e[nu][0])%N[0]
-							,(n[1]+e[nu][1])%N[1]
-							,(n[2]+e[nu][2])%N[2]
-							,(n[3]+e[nu][3])%N[3]
-							)
-					
-					plaq = (field[n+(mu,)]
-							*field[dir_mu+(nu,)]
-							*(np.conj(field[dir_nu+(mu,)]))
-							*(np.conj(field[n+(nu,)]))
-							)
-					
-					sp += plaq.real
-					
-		return sp/lat_size/(lat_dim-1.)/2.
 
 	def polyakovLoop(self,field):
 
@@ -294,24 +259,6 @@ class U1():
 			p += p_local
 
 		return p/self.lat_size*N[-1]
-	
-	def polyakovLoop_nb(self,field):
-		return self._polyakovLoop_nb(field,self.lat_shape,self.lat_size,self.lat_dim)
-	
-	@staticmethod
-	@nb.njit
-	def _polyakovLoop_nb(field,lat_shape,lat_size,lat_dim):
-
-		N = lat_shape
-		p = 0. + 0.j
-
-		for n in np.ndindex(tuple(N[:-1])):
-			p_local = 1. + 0.j
-			for t in range(N[-1]):
-				p_local *= field[tuple(n)+(t,)+(lat_dim-1,)]
-			p += p_local
-
-		return p/lat_size*N[-1]
 
 def action(lat, bare_args):
 	"""action class
