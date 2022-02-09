@@ -76,7 +76,7 @@ def metropolis(lat, bare_args={'beta':1}):
 
 	return (lat.field, accept)
 
-def calc_teq(bare_arg, O, init_lat, mcstep=metropolis, tol=1e-3, max_step=200, verbose=0, fig_title=None):
+def calc_teq(bare_arg, O, init_lat, mcstep=metropolis, stride=10, tol=1e-3, max_step=200, verbose=0, fig_title=None):
 
 	t_eq = max_step
 
@@ -93,8 +93,8 @@ def calc_teq(bare_arg, O, init_lat, mcstep=metropolis, tol=1e-3, max_step=200, v
 	hot_init = Lattice(init_lat.lat_shape)
 	hot_init.init_fields(field_type,'Hot',seed)
 
-	diff_temp = 10*tol
-	cold_res_temp = 0.
+	diff = 10*tol
+	#cold_res_temp = 0.
 
 	for i in range(max_step):
 		mcstep(cold_init, bare_arg)
@@ -103,16 +103,18 @@ def calc_teq(bare_arg, O, init_lat, mcstep=metropolis, tol=1e-3, max_step=200, v
 		cold_res = O(cold_init.field)
 		hot_res = O(hot_init.field)
 
-		diff = np.abs(cold_res - hot_res)
+		#diff = np.abs(np.mean(cold_rs - hot_res)
 		O_cold.append(cold_res)
 		O_hot.append(hot_res)
+		if i > stride:
+			diff = np.abs(np.average(O_cold[i-stride:i]) - np.average(O_hot[i-stride:i]))
 
-		if diff < tol and np.abs(cold_res - cold_res_temp) < tol:
+		#if diff < tol and np.abs(cold_res - cold_res_temp) < tol:
+		if diff < tol:
 			t_eq = i
 			break
 
-		diff_temp = diff
-		cold_res_temp = cold_res
+		#cold_res_temp = cold_res
 
 	if verbose :
 		plt.title("Estimation of thermalizationtion time")
