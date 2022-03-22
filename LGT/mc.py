@@ -154,7 +154,7 @@ def autocorrelation(conf, O, t):
 
 	return cor_t/(o1o1 - o1*o1 + eps)
 
-def calc_tac(bare_arg, O, init_lat, mcstep=metropolis, t_eq=100, n_conf_ac=500, verbose=0, fig_title=None):
+def calc_tac(bare_arg, O, init_lat, mcstep=metropolis, t_eq=100, n_conf_ac=500, verbose=False, fig_dir=None):
 
 	def fit_func(x,a,b):
 		return a*np.exp(-x/b)
@@ -197,7 +197,8 @@ def calc_tac(bare_arg, O, init_lat, mcstep=metropolis, t_eq=100, n_conf_ac=500, 
 		plt.ylabel("Autocorrelation")
 		plt.grid("True")
 		plt.show()
-		if fig_title is not None:
+		if fig_dir is not None:
+			fig_title = fig_dir+"b%.3ftac%.3f.png"%(bare_args['beta'],tac)
 			plt.savefig(fig_title)
 
 	return tac
