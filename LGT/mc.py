@@ -198,7 +198,7 @@ def calc_tac(bare_arg, O, init_lat, mcstep=metropolis, t_eq=100, n_conf_ac=500, 
 		plt.grid("True")
 		plt.show()
 		if fig_dir is not None:
-			fig_title = fig_dir+"b%.3ftac%.3f.png"%(bare_args['beta'],tac)
+			fig_title = fig_dir+"b%.3ftac%.3f.png"%(bare_arg['beta'],tac)
 			plt.savefig(fig_title)
 
 	return tac
