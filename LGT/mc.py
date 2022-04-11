@@ -94,6 +94,7 @@ def calc_teq(bare_arg, O, init_lat, mcstep=metropolis, stride=10, tol=1e-3, max_
 	hot_init.init_fields(field_type,'Hot',seed)
 
 	diff = 10*tol
+	self_diff = 10*tol
 	#cold_res_temp = 0.
 
 	for i in range(max_step):
@@ -106,11 +107,12 @@ def calc_teq(bare_arg, O, init_lat, mcstep=metropolis, stride=10, tol=1e-3, max_
 		#diff = np.abs(np.mean(cold_rs - hot_res)
 		O_cold.append(cold_res)
 		O_hot.append(hot_res)
-		if i > stride:
+		if i > 2*stride:
 			diff = np.abs(np.average(O_cold[i-stride:i]) - np.average(O_hot[i-stride:i]))
+			self_diff = np.abs(np.average(O_cold[i-2*stride:i-stride] - np.average(O_cold[i-stride:i])))
 
 		#if diff < tol and np.abs(cold_res - cold_res_temp) < tol:
-		if diff < tol:
+		if diff < tol and self_diff < tol:
 			t_eq = i
 			break
 
