@@ -156,6 +156,14 @@ class U1():
 
 		return s
 
+	def S_nb(self, field):
+		
+		sp = self.plaquetteSum_nb(field,ave=False).real
+		
+		s = self.lat_size*(self.lat_dim*(self.lat_dim-1.)/2.) - sp
+		
+		return s
+
 	def DS(self, field, mu, *args):
 		"""Difference in action
 
@@ -231,7 +239,7 @@ class U1():
 
 		return A
 
-	def plaquetteSum(self,field):
+	def plaquetteSum(self,field,ave=True):
 		"""Normalized plaquette sum
 		"""
 
@@ -243,14 +251,17 @@ class U1():
 				for mu in range(nu):
 					sp += self.plaquette(field,n,mu,nu).real
 
-		return sp/self.lat_size/(self.lat_dim-1.)/2.
+		if ave:
+			return sp/self.lat_size/(self.lat_dim*(self.lat_dim-1.)/2.)
+		else:
+			return sp
 
-	def plaquetteSum_nb(self,field):
-		return self._plaquetteSum_nb(field,self.lat_dim,self.lat_size)
+	def plaquetteSum_nb(self,field,ave=True):
+		return self._plaquetteSum_nb(field,self.lat_dim,self.lat_size,ave)
 	
 	@staticmethod
 	@nb.jit
-	def _plaquetteSum_nb(field,lat_dim,lat_size):
+	def _plaquetteSum_nb(field,lat_dim,lat_size,ave=True):
 
 		#e = np.identity(lat_dim,dtype=int)
 		e = np.array([[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]])
@@ -280,7 +291,10 @@ class U1():
 					
 					sp += plaq.real
 					
-		return sp/lat_size/(lat_dim-1.)/2.
+		if ave:
+			return sp/lat_size/(lat_dim*(lat_dim-1.)/2.)
+		else:
+			return sp
 
 	def polyakovLoop(self,field):
 
