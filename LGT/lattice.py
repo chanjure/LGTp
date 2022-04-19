@@ -90,7 +90,7 @@ class Lattice:
 		self.init_scheme = init_scheme
 		
 		# Initialization parameter validation list
-		available_field_type_list = ['Ising2d', 'U1', 'U1-2d', 'SU3']
+		available_field_type_list = ['Ising2d', 'U1', 'U1-3d', 'U1-2d', 'SU3']
 		available_init_scheme_list = ['Cold', 'Hot', 'man']
 
 		# Initialization step error control
@@ -109,7 +109,7 @@ class Lattice:
 			#else:
 			#	self.err(err_id=1, err_msg='Ising')
 		
-		elif self.field_type == 'U1' or self.field_type == 'U1-2d':
+		elif self.field_type == 'U1' or self.field_type == 'U1-2d' or self.field_type == 'U1-3d':
 			self.aux_index = self.lat_dim
 			if self.init_scheme == 'Cold':
 				self.field = np.ones(self.lat_shape + [self.lat_dim], dtype=np.complex128)
@@ -123,7 +123,7 @@ class Lattice:
 	def bare_parameter_generator(self,):
 		if self.field_type == "Ising2d":
 			bare_args = {'beta':0.1,'J':1.,'h':0.,'mu':0}
-		elif self.field_type == "U1" or self.field_type == "U1-2d":
+		elif self.field_type == "U1" or self.field_type == "U1-2d" or self.field_type == "U1-3d":
 			bare_args = {'beta':0.1}
 
 		return bare_args
@@ -134,7 +134,7 @@ class Lattice:
 
 		if self.field_type == 'Ising2d':
 			check = (bare_args.keys() == Ising2d_paramters.keys())
-		elif self.field_type == 'U1' or self.field_type == "U1-2d":
+		elif self.field_type == 'U1' or self.field_type == "U1-2d" or self.field_type == "U1-3d":
 			check = (bare_args.keys() == U1_parameters.keys())
 
 		return check
