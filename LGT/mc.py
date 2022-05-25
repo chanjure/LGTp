@@ -189,9 +189,7 @@ def calc_tac(bare_arg, O, init_lat, mcstep=metropolis, t_eq=100, n_conf_ac=500, 
 	fit_b, fit_cov = curve_fit(fit_func,np.arange(fit_range),ac_hist[:fit_range])
 	
 	tac_exp = fit_b[1]
-	x = np.arange(fit_range)
-	y = fit_func(x,fit_b[0],fit_b[1],fit_b[2])
-	tac_int = 0.5 + np.sum(y)
+	tac_int = 0.5 + np.sum(ac_hist)
 
 	beta = bare_arg['beta']
 	if verbose :
@@ -199,9 +197,9 @@ def calc_tac(bare_arg, O, init_lat, mcstep=metropolis, t_eq=100, n_conf_ac=500, 
 		y = fit_func(x,fit_b[0],fit_b[1],fit_b[2])
 
 		plt.clf()
-		plt.title(r"Autocorrelation plot $\beta$=%0.3f $t_{ac}$=%0.3f"%(beta,tac_int), fontsize=15)
+		plt.title(r"Autocorrelation plot $\beta$=%0.3f $tau_{ac}$=%0.3f"%(beta,tac_int), fontsize=15)
 		plt.plot(x, ac_hist[:fit_lim], 'C0.', label="Autocorrelation")
-		plt.plot(x,y[:fit_lim],'C3.',label="Exponential fit")
+		plt.plot(x,y[:fit_lim],'C3.',label=r"Exponential fit $tau_{exp}$=%0.3f"%(tac_exp))
 		plt.xlabel("Monte Carlo time", fontsize=12)
 		plt.ylabel("Autocorrelation", fontsize=12)
 		plt.legend(loc="upper right",fontsize=12)
