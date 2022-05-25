@@ -160,8 +160,8 @@ def autocorrelation(conf, O, t):
 
 def calc_tac(bare_arg, O, init_lat, mcstep=metropolis, t_eq=100, n_conf_ac=500, verbose=False, fig_dir=None):
 
-	def fit_func(x,a,b,c):
-		return a*np.exp(-x/b) + c
+	def fit_func(x,a,b):
+		return a*np.exp(-x/b)
 
 	lat_shape = init_lat.lat_shape
 	field_type = init_lat.field_type
@@ -194,7 +194,7 @@ def calc_tac(bare_arg, O, init_lat, mcstep=metropolis, t_eq=100, n_conf_ac=500, 
 	beta = bare_arg['beta']
 	if verbose :
 		x = np.arange(n_conf_ac)
-		y = fit_func(x,fit_b[0],fit_b[1],fit_b[2])
+		y = fit_func(x,fit_b[0],fit_b[1])
 
 		plt.clf()
 		plt.title(r"Autocorrelation plot $\beta$=%0.3f $tau_{ac}$=%0.3f"%(beta,tac_int), fontsize=15)
