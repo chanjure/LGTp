@@ -120,7 +120,7 @@ def calc_teq(bare_arg, O, init_lat, mcstep=metropolis, stride=10, tol=1e-2, max_
 
 	if verbose :
 		plt.clf()
-		plt.title(r"Estimation of thermalizationtion time $\tau_{eq}$=%d"%(t_eq), fontsize=15)
+		plt.title(r"Estimation of thermalization time $1/e^2$=%.3f $\tau_{eq}$=%d"%(beta,t_eq), fontsize=15)
 		plt.plot(np.arange(len(O_cold)),np.abs(O_cold),'C0.',label='cold start')
 		plt.plot(np.arange(len(O_hot)),np.abs(O_hot),'C3.',label='hot start')
 		plt.legend(loc='lower right',fontsize=12)
@@ -197,7 +197,7 @@ def calc_tac(bare_arg, O, init_lat, mcstep=metropolis, t_eq=100, n_conf_ac=500, 
 		y = fit_func(x,fit_b[0],fit_b[1])
 
 		plt.clf()
-		plt.title(r"Autocorrelation plot $\beta$=%0.3f $tau_{ac}$=%0.3f"%(beta,tac_int), fontsize=15)
+		plt.title(r"Autocorrelation plot $1/e^2$=%0.3f $tau_{ac}$=%0.3f"%(beta,tac_int), fontsize=15)
 		plt.plot(x, ac_hist[:fit_lim], 'C0.', label="Autocorrelation")
 		plt.plot(x,y[:fit_lim],'C3.',label=r"Exponential fit $tau_{exp}$=%0.3f"%(tac_exp))
 		plt.xlabel("Monte Carlo time", fontsize=12)
