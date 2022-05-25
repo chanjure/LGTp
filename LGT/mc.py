@@ -76,7 +76,7 @@ def metropolis(lat, bare_args={'beta':1}):
 
 	return (lat.field, accept)
 
-def calc_teq(bare_arg, O, init_lat, mcstep=metropolis, stride=10, tol=1e-3, max_step=200, verbose=0, fig_dir=None):
+def calc_teq(bare_arg, O, init_lat, mcstep=metropolis, stride=10, tol=1e-2, max_step=300, verbose=0, fig_dir=None):
 
 	t_eq = max_step
 
@@ -160,8 +160,8 @@ def autocorrelation(conf, O, t):
 
 def calc_tac(bare_arg, O, init_lat, mcstep=metropolis, t_eq=100, n_conf_ac=500, verbose=False, fig_dir=None):
 
-	def fit_func(x,a,b):
-		return a*np.exp(-x/b)
+	def fit_func(x,a,b,c):
+		return a*np.exp(-x/b) + c
 
 	lat_shape = init_lat.lat_shape
 	field_type = init_lat.field_type
@@ -184,7 +184,8 @@ def calc_tac(bare_arg, O, init_lat, mcstep=metropolis, t_eq=100, n_conf_ac=500, 
 	for i in range(n_conf_ac):
 		ac_hist[i] = autocorrelation(conf_ac, O, i)
 	
-	fit_range = n_conf_ac - int(n_conf_ac/5)
+	fit_lim = int(n_conf_ac/5)
+	fit_range = n_conf_ac - fit_lim
 	fit_b, fit_cov = curve_fit(fit_func,np.arange(fit_range),ac_hist[:fit_range])
 	
 	tac = fit_b[1]
@@ -192,12 +193,12 @@ def calc_tac(bare_arg, O, init_lat, mcstep=metropolis, t_eq=100, n_conf_ac=500, 
 	beta = bare_arg['beta']
 	if verbose :
 		x = np.arange(n_conf_ac)
-		y = fit_func(x,fit_b[0],fit_b[1])
+		y = fit_func(x,fit_b[0],fit_b[1],fit_b[2])
 
 		plt.clf()
 		plt.title(r"Autocorrelation plot $\beta$=%0.3f $t_{ac}$=%0.3f"%(beta,tac), fontsize=15)
-		plt.plot(x[:200], ac_hist[:200], 'C0.', label="Autocorrelation")
-		plt.plot(x[:200],y[:200],'C3.',label="Exponential fit")
+		plt.plot(x, ac_hist[:fit_lim], 'C0.', label="Autocorrelation")
+		plt.plot(x,y[:fit_lim],'C3.',label="Exponential fit")
 		plt.xlabel("Monte Carlo time", fontsize=12)
 		plt.ylabel("Autocorrelation", fontsize=12)
 		plt.legend(loc="upper right",fontsize=12)
