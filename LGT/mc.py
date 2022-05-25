@@ -118,6 +118,7 @@ def calc_teq(bare_arg, O, init_lat, mcstep=metropolis, stride=10, tol=1e-2, max_
 
 		#cold_res_temp = cold_res
 
+	beta = bare_arg['beta']
 	if verbose :
 		plt.clf()
 		plt.title(r"Estimation of thermalization time $1/e^2$=%.3f $\tau_{eq}$=%d"%(beta,t_eq), fontsize=15)
