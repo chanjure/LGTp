@@ -326,6 +326,25 @@ class U1():
 			p += p_local
 
 		return p/lat_size*N[-1]
+	
+	def polyakovLoopR_nb(self,field):
+		Pol =  self._polyakovLoopR_nb(field,self.lat_size,self.lat_dim)
+		return np.sqrt(Pol*np.conj(Pol)).real
+	
+	@staticmethod
+	@nb.njit
+	def _polyakovLoopR_nb(field,lat_size,lat_dim):
+
+		N = np.shape(field)[:-1]
+		p = 0. + 0.j
+
+		for n in np.ndindex(N[:-1]):
+			p_local = 1. + 0.j
+			for t in range(N[-1]):
+				p_local *= field[n+(t,)+(lat_dim-1,)]
+			p += p_local
+
+		return p/lat_size*N[-1]
 
 class U1_3d():
 

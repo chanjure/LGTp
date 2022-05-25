@@ -76,7 +76,7 @@ def metropolis(lat, bare_args={'beta':1}):
 
 	return (lat.field, accept)
 
-def calc_teq(bare_arg, O, init_lat, mcstep=metropolis, stride=10, tol=1e-3, max_step=200, verbose=0, fig_title=None):
+def calc_teq(bare_arg, O, init_lat, mcstep=metropolis, stride=10, tol=1e-3, max_step=200, verbose=0, fig_dir=None):
 
 	t_eq = max_step
 
@@ -119,16 +119,18 @@ def calc_teq(bare_arg, O, init_lat, mcstep=metropolis, stride=10, tol=1e-3, max_
 		#cold_res_temp = cold_res
 
 	if verbose :
-		plt.title("Estimation of thermalizationtion time")
-		plt.plot(np.arange(len(O_cold)),O_cold,'C0',label='cold')
-		plt.plot(np.arange(len(O_hot)),O_hot,'C3',label='hot')
-		plt.legend(loc='upper right')
-		plt.xlabel("Monte Carlo time")
-		plt.ylabel("Observable")
+		plt.clf()
+		plt.title(r"Estimation of thermalizationtion time $\tau_{eq}$=%d"%(t_eq), fontsize=15)
+		plt.plot(np.arange(len(O_cold)),np.abs(O_cold),'C0.',label='cold start')
+		plt.plot(np.arange(len(O_hot)),np.abs(O_hot),'C3.',label='hot start')
+		plt.legend(loc='lower right',fontsize=12)
+		plt.xlabel("Monte Carlo time",fontsize=12)
+		plt.ylabel("Observable",fontsize=12)
 		plt.grid(True)
-		plt.show()
-		if fig_title is not None:
-			plt.savefig(fig_title)
+		#plt.show()
+		if fig_dir is not None:
+			fig_title = fig_dir+"/b%.3fteq%.3f.png"%(bare_arg['beta'],t_eq)
+			plt.savefig(fig_title,dpi=600)
 
 	return t_eq
 
@@ -192,16 +194,18 @@ def calc_tac(bare_arg, O, init_lat, mcstep=metropolis, t_eq=100, n_conf_ac=500, 
 		x = np.arange(n_conf_ac)
 		y = fit_func(x,fit_b[0],fit_b[1])
 
-		plt.title(r"Autocorrelation plot $\beta$=%0.3f $t_{ac}$=%0.3f"%(beta,tac))
-		plt.plot(x, ac_hist, 'C0o')
-		plt.plot(x,y,'C3')
-		plt.xlabel("Monte Carlo time")
-		plt.ylabel("Autocorrelation")
+		plt.clf()
+		plt.title(r"Autocorrelation plot $\beta$=%0.3f $t_{ac}$=%0.3f"%(beta,tac), fontsize=15)
+		plt.plot(x[:200], ac_hist[:200], 'C0.', label="Autocorrelation")
+		plt.plot(x[:200],y[:200],'C3.',label="Exponential fit")
+		plt.xlabel("Monte Carlo time", fontsize=12)
+		plt.ylabel("Autocorrelation", fontsize=12)
+		plt.legend(loc="upper right",fontsize=12)
 		plt.grid("True")
-		plt.show()
+		#plt.show()
 		if fig_dir is not None:
-			fig_title = fig_dir+"b%.3ftac%.3f.png"%(bare_arg['beta'],tac)
-			plt.savefig(fig_title)
+			fig_title = fig_dir+"/b%.3ftac%.3f.png"%(bare_arg['beta'],tac)
+			plt.savefig(fig_title, dpi=600)
 
 	return tac
 
