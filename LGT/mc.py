@@ -188,7 +188,10 @@ def calc_tac(bare_arg, O, init_lat, mcstep=metropolis, t_eq=100, n_conf_ac=500, 
 	fit_range = n_conf_ac - fit_lim
 	fit_b, fit_cov = curve_fit(fit_func,np.arange(fit_range),ac_hist[:fit_range])
 	
-	tac = fit_b[1]
+	tac_exp = fit_b[1]
+	x = np.arange(fit_range)
+	y = fit_func(x,fit_b[0],fit_b[1],fit_b[2])
+	tac_int = 0.5 + np.sum(y)
 
 	beta = bare_arg['beta']
 	if verbose :
@@ -196,7 +199,7 @@ def calc_tac(bare_arg, O, init_lat, mcstep=metropolis, t_eq=100, n_conf_ac=500, 
 		y = fit_func(x,fit_b[0],fit_b[1],fit_b[2])
 
 		plt.clf()
-		plt.title(r"Autocorrelation plot $\beta$=%0.3f $t_{ac}$=%0.3f"%(beta,tac), fontsize=15)
+		plt.title(r"Autocorrelation plot $\beta$=%0.3f $t_{ac}$=%0.3f"%(beta,tac_int), fontsize=15)
 		plt.plot(x, ac_hist[:fit_lim], 'C0.', label="Autocorrelation")
 		plt.plot(x,y[:fit_lim],'C3.',label="Exponential fit")
 		plt.xlabel("Monte Carlo time", fontsize=12)
@@ -205,9 +208,9 @@ def calc_tac(bare_arg, O, init_lat, mcstep=metropolis, t_eq=100, n_conf_ac=500, 
 		plt.grid("True")
 		#plt.show()
 		if fig_dir is not None:
-			fig_title = fig_dir+"/b%.3ftac%.3f.png"%(bare_arg['beta'],tac)
+			fig_title = fig_dir+"/b%.3ftac%.3f.png"%(bare_arg['beta'],tac_int)
 			plt.savefig(fig_title, dpi=600)
 
-	return tac
+	return tac_int
 
 
