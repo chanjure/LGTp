@@ -198,9 +198,9 @@ def calc_tac(bare_arg, O, init_lat, mcstep=metropolis, t_eq=100, n_conf_ac=500, 
 		y = fit_func(x,fit_b[0],fit_b[1])
 
 		plt.clf()
-		plt.title(r"Autocorrelation plot $1/e^2$=%0.3f $tau_{ac}$=%0.3f"%(beta,tac_int), fontsize=15)
-		plt.plot(x, ac_hist[:fit_lim], 'C0.', label="Autocorrelation")
-		plt.plot(x,y[:fit_lim],'C3.',label=r"Exponential fit $tau_{exp}$=%0.3f"%(tac_exp))
+		plt.title(r"Autocorrelation plot $1/e^2$=%0.3f $\tau_{ac}$=%0.3f"%(beta,tac_int), fontsize=15)
+		plt.plot(x[:fit_range], ac_hist[:fit_range], 'C0.', label="Autocorrelation")
+		plt.plot(x[:fit_range], y[:fit_range],'C3.',label=r"Exponential fit $tau_{exp}$=%0.3f"%(tac_exp))
 		plt.xlabel("Monte Carlo time", fontsize=12)
 		plt.ylabel("Autocorrelation", fontsize=12)
 		plt.legend(loc="upper right",fontsize=12)
