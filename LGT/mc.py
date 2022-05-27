@@ -190,17 +190,19 @@ def calc_tac(bare_arg, O, init_lat, mcstep=metropolis, t_eq=100, n_conf_ac=500, 
 	fit_b, fit_cov = curve_fit(fit_func,np.arange(fit_range),ac_hist[:fit_range])
 	
 	tac_exp = fit_b[1]
-	tac_int = 0.5 + np.sum(ac_hist)
+	tac_int = 0.5 + np.sum(np.abs(ac_hist))
 
 	beta = bare_arg['beta']
 	if verbose :
 		x = np.arange(n_conf_ac)
 		y = fit_func(x,fit_b[0],fit_b[1])
+		z = fit_func(x,fit_b[0],tac_int)
 
 		plt.clf()
 		plt.title(r"Autocorrelation plot $1/e^2$=%0.3f $\tau_{ac}$=%0.3f"%(beta,tac_int), fontsize=15)
 		plt.plot(x[:fit_range], ac_hist[:fit_range], 'C0.', label="Autocorrelation")
-		plt.plot(x[:fit_range], y[:fit_range],'C3.',label=r"Exponential fit $tau_{exp}$=%0.3f"%(tac_exp))
+		plt.plot(x[:fit_range], y[:fit_range],'C3.',label=r"Exponential fit $\tau_{exp}$=%0.3f"%(tac_exp))
+		plt.plot(x[:fit_range], z[:fit_range],'C4.',label=r"Integrated fit $\tau_{int}$=%0.3f"%(tac_int))
 		plt.xlabel("Monte Carlo time", fontsize=12)
 		plt.ylabel("Autocorrelation", fontsize=12)
 		plt.legend(loc="upper right",fontsize=12)
@@ -210,6 +212,6 @@ def calc_tac(bare_arg, O, init_lat, mcstep=metropolis, t_eq=100, n_conf_ac=500, 
 			fig_title = fig_dir+"/b%.3ftac%.3f.png"%(bare_arg['beta'],tac_int)
 			plt.savefig(fig_title, dpi=600)
 
-	return tac_int
+	return tac_exp
 
 
