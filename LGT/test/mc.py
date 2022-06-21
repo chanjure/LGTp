@@ -129,8 +129,8 @@ def calc_teq(bare_arg, O, init_lat, mcstep=metropolis, stride=10, tol=1e-3, max_
 
 	return t_eq, O_cold
 
-def autocorrelation(O, t):
-	N = len(O) - t
+def autocorrelation1(conf, O, t):
+	N = len(conf) - t
 	eps = 1e-7
 
 	o1o2 = 0.
@@ -142,12 +142,12 @@ def autocorrelation(O, t):
 
 	for i in range(N):
 
-		o1o2 += O[i]*O[i+t]/N
+		o1o2 += O(conf[i])*O(conf[i+t])/N
 
-		o1 += O[i]/N
-		o2 += O[i+t]/N
+		o1 += O(conf([i])/N
+		o2 += O(conf[i+t])/N
 
-		o1o1 += O[i]*O[i]/N
+		o1o1 += O(conf[i])*O(conf[i])/N
 
 	cor_t = o1o2 - o1*o2
 
@@ -180,7 +180,7 @@ def calc_tac(bare_arg, O, init_lat, mcstep=metropolis, t_eq=100, n_conf_ac=500, 
 	ac_hist = np.empty(n_conf_ac)
 
 	for i in range(n_conf_ac):
-		ac_hist[i] = autocorrelation(conf_ac, O, i)
+		ac_hist[i] = autocorrelation1(conf_ac, O, i)
 	
 	fit_lim = int(n_conf_ac/5)
 	fit_range = n_conf_ac - fit_lim
@@ -210,6 +210,30 @@ def calc_tac(bare_arg, O, init_lat, mcstep=metropolis, t_eq=100, n_conf_ac=500, 
 			plt.savefig(fig_title, dpi=600)
 
 	return tac_exp
+
+def autocorrelation(O, t):
+	N = len(O) - t
+	eps = 1e-7
+
+	o1o2 = 0.
+	o1 = 0.
+	o2 = 0.
+
+	o1o1 = 0.
+	o2o2 = 0.
+
+	for i in range(N):
+
+		o1o2 += O[i]*O[i+t]/N
+
+		o1 += O[i]/N
+		o2 += O[i+t]/N
+
+		o1o1 += O[i]*O[i]/N
+
+	cor_t = o1o2 - o1*o2
+
+	return cor_t/(o1o1 - o1*o1 + eps)
 
 def calc_teq_tac(bare_arg, O, init_lat, mcstep=metropolis, max_steps=500, tol=1e-5, verbose=False, fig_dir=None, use_lat=False):
 
