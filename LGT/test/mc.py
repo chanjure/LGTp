@@ -144,7 +144,7 @@ def autocorrelation1(conf, O, t):
 
 		o1o2 += O(conf[i])*O(conf[i+t])/N
 
-		o1 += O(conf([i])/N
+		o1 += O(conf[i])/N
 		o2 += O(conf[i+t])/N
 
 		o1o1 += O(conf[i])*O(conf[i])/N
@@ -281,39 +281,38 @@ def calc_teq_tac(bare_arg, O, init_lat, mcstep=metropolis, max_steps=500, tol=1e
 		plt.clf()
 		x = np.arange(max_steps)
 
+		f = plt.figure(figsize=(6.4,4.8*2)
+
 		# Plot teq
-		plt.title(r"Estimation of thermalization time $1/e^2$=%.3f $\tau_{eq}$=%d"%(beta,teq), fontsize=15)
+		s_teq = f.add_subplot(2,1,1)
+		s_teq.set_title(r"Estimation of thermalization time $1/e^2$=%.3f $\tau_{eq}$=%d"%(beta,teq), fontsize=15)
 
-		plt.plot(x,np.abs(O_hist),'C0.',label='Observable')
-		plt.plot(x,teq_fit_func(x,teq_b[0],teq_b[1],teq_b[2]),'C1.',label='Exponential fit')
-		plt.axvline(teq,color='C3',linestyle='--',label=r'$\tau_{eq}=$%0.3f'%(teq))
-		plt.legend(loc='lower right',fontsize=12)
-		plt.xlabel("Monte Carlo time",fontsize=12)
-		plt.ylabel("Observable",fontsize=12)
-		plt.grid(True)
-		plt.show()
+		s_teq.plot(x,np.abs(O_hist),'C0.',label='Observable')
+		s_teq.plot(x,teq_fit_func(x,teq_b[0],teq_b[1],teq_b[2]),'C1.',label='Exponential fit')
+		s_teq.axvline(teq,color='C3',linestyle='--',label=r'$\tau_{eq}=$%0.3f'%(teq))
+		s_teq.legend(loc='lower right',fontsize=12)
+		s_teq.set_xlabel("Monte Carlo time",fontsize=12)
+		s_teq.set_ylabel("Observable",fontsize=12)
+		s_teq.grid(True)
 
-		if fig_dir is not None:
-			fig_title = fig_dir+"/b%.3fteq%.3f.png"%(bare_arg['beta'],teq)
-			plt.savefig(fig_title,dpi=600)
-		
 		# Plot tac
 		y = tac_fit_func(x,tac_b[0],tac_b[1])
 		z = tac_fit_func(x,tac_b[0],tac_int)
 
-		plt.title(r"Autocorrelation plot $1/e^2$=%0.3f $\tau_{ac}$=%0.3f"%(beta,tac_int), fontsize=15)
-		plt.plot(x[:fit_range], ac_hist[:fit_range], 'C0.', label="Autocorrelation")
-		plt.plot(x[:fit_range], y[:fit_range],'C1.',label=r"Exponential fit $\tau_{exp}$=%0.3f"%(tac_exp))
-		plt.plot(x[:fit_range], z[:fit_range],'C2.',label=r"Integrated fit $\tau_{int}$=%0.3f"%(tac_int))
-		plt.axvline(tac_exp,color='C3',linestyle='--', label=r'$\tau_ac=%.3f$'%(tac_exp))
+		s_tac = f.add_subplot(2,1,2)
+		s_tac.set_title(r"Autocorrelation plot $1/e^2$=%0.3f $\tau_{ac}$=%0.3f"%(beta,tac_int), fontsize=15)
+		s_tac.plot(x[:fit_range], ac_hist[:fit_range], 'C0.', label="Autocorrelation")
+		s_tac.plot(x[:fit_range], y[:fit_range],'C1.',label=r"Exponential fit $\tau_{exp}$=%0.3f"%(tac_exp))
+		s_tac.plot(x[:fit_range], z[:fit_range],'C2.',label=r"Integrated fit $\tau_{int}$=%0.3f"%(tac_int))
+		s_tac.axvline(tac_exp,color='C3',linestyle='--', label=r'$\tau_{ac}=%.3f$'%(tac_exp))
 		
-		plt.xlabel("Monte Carlo time", fontsize=12)
-		plt.ylabel("Autocorrelation", fontsize=12)
-		plt.legend(loc="upper right",fontsize=12)
-		plt.grid("True")
-		plt.show()
+		s_tac.set_xlabel("Monte Carlo time", fontsize=12)
+		s_tac.set_ylabel("Autocorrelation", fontsize=12)
+		s_tac.legend(loc="upper right",fontsize=12)
+		s_tac.grid("True")
+		
 		if fig_dir is not None:
-			fig_title = fig_dir+"/b%.3ftac%.3f.png"%(bare_arg['beta'],tac_int)
-			plt.savefig(fig_title, dpi=600)
+			fig_title = fig_dir+"/b%.3fteq%.3ftac%.3f.png"%(bare_arg['beta'],teq,tac_exp)
+			plt.savefig(fig_title,dpi=600)
 
 	return teq, tac_exp, O_hist, ac_hist

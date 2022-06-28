@@ -214,4 +214,108 @@ def calc_tac(bare_arg, O, init_lat, mcstep=metropolis, t_eq=100, n_conf_ac=500, 
 
 	return tac_exp
 
+def _ac(O, t):
+	N = len(O) - t
+	eps = 1e-7
 
+	o1o2 = 0.
+	o1 = 0.
+	o2 = 0.
+
+	o1o1 = 0.
+	o2o2 = 0.
+
+	for i in range(N):
+
+		o1o2 += O[i]*O[i+t]/N
+
+		o1 += O[i]/N
+		o2 += O[i+t]/N
+
+		o1o1 += O[i]*O[i]/N
+
+	cor_t = o1o2 - o1*o2
+
+	return cor_t/(o1o1 - o1*o1 + eps)
+
+def calc_teq_tac(bare_arg, O, init_lat, mcstep=metropolis, max_steps=500, tol=1e-5, verbose=False, fig_dir=None, use_lat=False):
+
+	def tac_fit_func(x,a,b):
+		return a*np.exp(-x/b)
+
+	def teq_fit_func(x,a,b,c):
+		return -a*np.exp(-x/b) + c
+
+	lat_shape = init_lat.lat_shape
+	field_type = init_lat.field_type
+	seed = init_lat.seed
+
+	if use_lat:
+		lat = init_lat
+	else:
+		lat = Lattice(lat_shape)
+		lat.init_fields(field_type,'Cold',seed)
+
+	ac_hist = np.empty(max_steps)
+	O_hist = np.empty(max_steps)
+
+	for e in range(max_steps):
+		mcstep(lat, bare_arg)
+		O_hist[e] = O(lat.field)
+
+	for i in range(max_steps):
+		ac_hist[i] = _ac(O_hist, i)
+	
+	# teq fit
+	# e^-x ~ tol => x ~ -ln(tol)
+	teq_b, teq_cov = curve_fit(teq_fit_func,np.arange(max_steps),np.abs(O_hist))
+	teq = teq_b[1]*(-np.log(tol))
+
+	# tac fit
+	fit_lim = int(max_steps/5.)
+	fit_range = max_steps - fit_lim
+	tac_b, tac_cov = curve_fit(tac_fit_func,np.arange(fit_range),ac_hist[:fit_range])
+	
+	tac_exp = tac_b[1]
+	tac_int = 0.5 + np.sum(np.abs(ac_hist))
+
+	beta = bare_arg['beta']
+	if verbose :
+		plt.clf()
+		x = np.arange(max_steps)
+
+		f = plt.figure(figsize=(6.4,4.8*2)
+
+		# Plot teq
+		s_teq = f.add_subplot(2,1,1)
+		s_teq.set_title(r"Estimation of thermalization time $1/e^2$=%.3f $\tau_{eq}$=%d"%(beta,teq), fontsize=15)
+
+		s_teq.plot(x,np.abs(O_hist),'C0.',label='Observable')
+		s_teq.plot(x,teq_fit_func(x,teq_b[0],teq_b[1],teq_b[2]),'C1.',label='Exponential fit')
+		s_teq.axvline(teq,color='C3',linestyle='--',label=r'$\tau_{eq}=$%0.3f'%(teq))
+		s_teq.legend(loc='lower right',fontsize=12)
+		s_teq.set_xlabel("Monte Carlo time",fontsize=12)
+		s_teq.set_ylabel("Observable",fontsize=12)
+		s_teq.grid(True)
+
+		# Plot tac
+		y = tac_fit_func(x,tac_b[0],tac_b[1])
+		z = tac_fit_func(x,tac_b[0],tac_int)
+
+		s_tac = f.add_subplot(2,1,2)
+		s_tac.set_title(r"Autocorrelation plot $1/e^2$=%0.3f $\tau_{ac}$=%0.3f"%(beta,tac_int), fontsize=15)
+		s_tac.plot(x[:fit_range], ac_hist[:fit_range], 'C0.', label="Autocorrelation")
+		s_tac.plot(x[:fit_range], y[:fit_range],'C1.',label=r"Exponential fit $\tau_{exp}$=%0.3f"%(tac_exp))
+		s_tac.plot(x[:fit_range], z[:fit_range],'C2.',label=r"Integrated fit $\tau_{int}$=%0.3f"%(tac_int))
+		s_tac.axvline(tac_exp,color='C3',linestyle='--', label=r'$\tau_{ac}=%.3f$'%(tac_exp))
+		
+		s_tac.set_xlabel("Monte Carlo time", fontsize=12)
+		s_tac.set_ylabel("Autocorrelation", fontsize=12)
+		s_tac.legend(loc="upper right",fontsize=12)
+		s_tac.grid("True")
+		
+		if fig_dir is not None:
+			fig_title = fig_dir+"/b%.3fteq%.3ftac%.3f.png"%(bare_arg['beta'],teq,tac_exp)
+			plt.savefig(fig_title,dpi=600)
+
+	return teq, tac_exp, O_hist, ac_hist
