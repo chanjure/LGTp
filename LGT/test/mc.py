@@ -281,7 +281,7 @@ def calc_teq_tac(bare_arg, O, init_lat, mcstep=metropolis, max_steps=500, tol=1e
 		plt.clf()
 		x = np.arange(max_steps)
 
-		f = plt.figure(figsize=(6.4,4.8*2)
+		f = plt.figure(figsize=(6.4,4.8*2))
 
 		# Plot teq
 		s_teq = f.add_subplot(2,1,1)

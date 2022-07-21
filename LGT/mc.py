@@ -269,7 +269,7 @@ def calc_teq_tac(bare_arg, O, init_lat, mcstep=metropolis, max_steps=500, tol=1e
 	# teq fit
 	# e^-x ~ tol => x ~ -ln(tol)
 	teq_b, teq_cov = curve_fit(teq_fit_func,np.arange(max_steps),np.abs(O_hist))
-	teq = teq_b[1]*(-np.log(tol))
+	teq = teq_b[1]*(-np.log(tol/np.abs(teq_b[0])))
 
 	# tac fit
 	fit_lim = int(max_steps/5.)
@@ -284,7 +284,7 @@ def calc_teq_tac(bare_arg, O, init_lat, mcstep=metropolis, max_steps=500, tol=1e
 		plt.clf()
 		x = np.arange(max_steps)
 
-		f = plt.figure(figsize=(6.4,4.8*2)
+		f = plt.figure(figsize=(6.4,4.8*2))
 
 		# Plot teq
 		s_teq = f.add_subplot(2,1,1)
@@ -303,16 +303,18 @@ def calc_teq_tac(bare_arg, O, init_lat, mcstep=metropolis, max_steps=500, tol=1e
 		z = tac_fit_func(x,tac_b[0],tac_int)
 
 		s_tac = f.add_subplot(2,1,2)
-		s_tac.set_title(r"Autocorrelation plot $1/e^2$=%0.3f $\tau_{ac}$=%0.3f"%(beta,tac_int), fontsize=15)
+		s_tac.set_title(r"Autocorrelation plot $1/e^2$=%0.3f $\tau_{ac}$=%0.3f"%(beta,tac_exp), fontsize=15)
 		s_tac.plot(x[:fit_range], ac_hist[:fit_range], 'C0.', label="Autocorrelation")
 		s_tac.plot(x[:fit_range], y[:fit_range],'C1.',label=r"Exponential fit $\tau_{exp}$=%0.3f"%(tac_exp))
-		s_tac.plot(x[:fit_range], z[:fit_range],'C2.',label=r"Integrated fit $\tau_{int}$=%0.3f"%(tac_int))
+		# s_tac.plot(x[:fit_range], z[:fit_range],'C2.',label=r"Integrated fit $\tau_{int}$=%0.3f"%(tac_int))
 		s_tac.axvline(tac_exp,color='C3',linestyle='--', label=r'$\tau_{ac}=%.3f$'%(tac_exp))
 		
 		s_tac.set_xlabel("Monte Carlo time", fontsize=12)
 		s_tac.set_ylabel("Autocorrelation", fontsize=12)
 		s_tac.legend(loc="upper right",fontsize=12)
 		s_tac.grid("True")
+
+		f.tight_layout()
 		
 		if fig_dir is not None:
 			fig_title = fig_dir+"/b%.3fteq%.3ftac%.3f.png"%(bare_arg['beta'],teq,tac_exp)
